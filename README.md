@@ -2,6 +2,9 @@
 
 ## Introduction
 
+Project is highly inspired and refered from [Link](https://github.com/atulapra/Emotion-detection) this project. We have added extra feature to recommend music by detecting emotion by facial recognition.
+Big thanks to atulapra.
+
 This project aims to classify the emotion on a person's face into one of **seven categories**, using deep convolutional neural networks. The model is trained on the **FER-2013** dataset which was published on International Conference on Machine Learning (ICML). This dataset consists of 35887 grayscale, 48x48 sized face images with **seven emotions** - angry, disgusted, fearful, happy, neutral, sad and surprised.
 
 ## Dependencies
@@ -16,8 +19,8 @@ The repository is currently compatible with `tensorflow-2.0` and makes use of th
 * First, clone the repository and enter the folder
 
 ```bash
-git clone https://github.com/atulapra/Emotion-detection.git
-cd Emotion-detection
+git clone https://github.com/Rajkaranm/emotion_dectection_with_face_recognition
+cd emotion_dection_with_face_recognition
 ```
 
 * Download the FER-2013 dataset from [here](https://drive.google.com/file/d/1X60B-uR3NtqPd4oosdotpbDgy8KOfUdr/view?usp=sharing) and unzip it inside the `src` folder. This will create the folder `data`.
@@ -36,6 +39,16 @@ cd src
 python emotions.py --mode display
 ```
 
+* On the backend server
+
+
+```bash
+cd backend
+python manage.py runserver
+```
+
+
+
 * The folder structure is of the form:  
   src:
   * data (folder)
@@ -53,24 +66,3 @@ python emotions.py --mode display
 
 * In case you are looking to experiment with new datasets, you may have to deal with data in the csv format. I have provided the code I wrote for data preprocessing in the `dataset_prepare.py` file which can be used for reference.
 
-## Algorithm
-
-* First, the **haar cascade** method is used to detect faces in each frame of the webcam feed.
-
-* The region of image containing the face is resized to **48x48** and is passed as input to the CNN.
-
-* The network outputs a list of **softmax scores** for the seven classes of emotions.
-
-* The emotion with maximum score is displayed on the screen.
-
-## Example Output
-
-![Mutiface](imgs/multiface.png)
-
-## References
-
-* "Challenges in Representation Learning: A report on three machine learning contests." I Goodfellow, D Erhan, PL Carrier, A Courville, M Mirza, B
-   Hamner, W Cukierski, Y Tang, DH Lee, Y Zhou, C Ramaiah, F Feng, R Li,  
-   X Wang, D Athanasakis, J Shawe-Taylor, M Milakov, J Park, R Ionescu,
-   M Popescu, C Grozea, J Bergstra, J Xie, L Romaszko, B Xu, Z Chuang, and
-   Y. Bengio. arXiv 2013.

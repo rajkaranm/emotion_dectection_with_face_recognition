@@ -11,6 +11,11 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+import requests
+import webbrowser
+import json
+from pynput.keyboard import Key, Listener
+
 # command line argument
 ap = argparse.ArgumentParser()
 ap.add_argument("--mode",help="train/display")
@@ -110,6 +115,9 @@ elif mode == "display":
 
     # start the webcam feed
     cap = cv2.VideoCapture(0)
+    opened = True
+    k = cv2.waitKey(1)
+
     while True:
         # Find haar cascade to draw bounding box around face
         ret, frame = cap.read()
@@ -124,6 +132,30 @@ elif mode == "display":
             roi_gray = gray[y:y + h, x:x + w]
             cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
             prediction = model.predict(cropped_img)
+            # print(prediction)
+            
+            # def show(key):
+            #     print('\nYou Entered {0}'.format( key))
+            #     if key == Key.delete:
+            #         # Stop listener
+            #         return False
+
+            # with Listener(on_press = show) as listener:
+            #     listener.join()
+            
+            if cv2.waitKey(1) & 0xFF == ord('p'):
+                opened = False
+
+            for i in range(7):
+                for j in range(7):
+                    if  np.array(prediction)[0][i]  == 1 and not opened:
+                        json_data = requests.get(f"http://127.0.0.1:8000/api/songs/{i}")
+                        json_data = json_data.json()
+                        webbrowser.open(json_data['url'])
+                        opened = True
+
+
+
             maxindex = int(np.argmax(prediction))
             cv2.putText(frame, emotion_dict[maxindex], (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
