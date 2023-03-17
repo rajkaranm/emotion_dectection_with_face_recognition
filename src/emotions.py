@@ -15,6 +15,33 @@ import requests
 import webbrowser
 import json
 from pynput.keyboard import Key, Listener
+import speech
+
+opened = True
+speaking = False
+
+
+
+def open_song():
+    global opened
+    for i in range(7):
+        for j in range(7):
+            if np.array(emotion_prediction)[0][i]  == 1 and not opened:
+                json_data = requests.get(f"http://127.0.0.1:8000/api/songs/{i}")
+                json_data = json_data.json()
+                webbrowser.open(json_data['url'])
+                opened = True
+
+def voice_feature():
+    global speaking, opened
+    if (speaking):
+        res = speech.recognized_speech()
+        print(res)
+        if res in "suggest me a song":
+            opened = False
+            print("match")
+            open_song()
+        speaking = False
 
 # command line argument
 ap = argparse.ArgumentParser()
@@ -105,18 +132,21 @@ if mode == "train":
 
 # emotions will be displayed on your face from the webcam feed
 elif mode == "display":
+
     model.load_weights('model.h5')
 
     # prevents openCL usage and unnecessary logging messages
     cv2.ocl.setUseOpenCL(False)
+    
+  
 
     # dictionary which assigns each label an emotion (alphabetical order)
     emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
 
     # start the webcam feed
     cap = cv2.VideoCapture(0)
-    opened = True
     k = cv2.waitKey(1)
+
 
     while True:
         # Find haar cascade to draw bounding box around face
@@ -132,6 +162,9 @@ elif mode == "display":
             roi_gray = gray[y:y + h, x:x + w]
             cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
             prediction = model.predict(cropped_img)
+            global emotion_prediction
+            emotion_prediction = prediction
+
             # print(prediction)
             
             # def show(key):
@@ -146,20 +179,18 @@ elif mode == "display":
             if cv2.waitKey(1) & 0xFF == ord('p'):
                 opened = False
 
-            for i in range(7):
-                for j in range(7):
-                    if  np.array(prediction)[0][i]  == 1 and not opened:
-                        json_data = requests.get(f"http://127.0.0.1:8000/api/songs/{i}")
-                        json_data = json_data.json()
-                        webbrowser.open(json_data['url'])
-                        opened = True
+            if cv2.waitKey(1) & 0xFF == ord('v'):
+                speaking = True
+
+            open_song()
+            voice_feature()
 
 
 
             maxindex = int(np.argmax(prediction))
             cv2.putText(frame, emotion_dict[maxindex], (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        cv2.imshow('Video', cv2.resize(frame,(1600,960),interpolation = cv2.INTER_CUBIC))
+        cv2.imshow('Video', cv2.resize(frame,(1100,760),interpolation = cv2.INTER_CUBIC))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
