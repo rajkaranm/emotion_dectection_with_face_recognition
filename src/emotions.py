@@ -29,7 +29,10 @@ def open_song():
             if np.array(emotion_prediction)[0][i]  == 1 and not opened:
                 json_data = requests.get(f"http://127.0.0.1:8000/api/songs/{i}")
                 json_data = json_data.json()
-                webbrowser.open(json_data['url'])
+                try:
+                    webbrowser.open(json_data['url'])
+                except Exception as e:
+                    print("Error", e)
                 opened = True
 
 def voice_feature():
@@ -190,7 +193,7 @@ elif mode == "display":
             maxindex = int(np.argmax(prediction))
             cv2.putText(frame, emotion_dict[maxindex], (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        cv2.imshow('Video', cv2.resize(frame,(1100,760),interpolation = cv2.INTER_CUBIC))
+        cv2.imshow('Video', cv2.resize(frame,(800,600),interpolation = cv2.INTER_CUBIC))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

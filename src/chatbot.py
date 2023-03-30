@@ -1,8 +1,11 @@
 from tkinter import *
 import openai
+from dotenv import load_dotenv
+import os
 
-openai.api_key = "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"
+load_dotenv("../.env")
 
+openai.api_key = os.environ.get("CHAT_GPT_API_KEY")
 
 # GUI
 def createWindow():
@@ -24,17 +27,29 @@ def createWindow():
 		user = e.get().lower()
 		print(user)
 
-		response = openai.Completion.create(engine="text-davinci-002", prompt="HI", max_tokens=2000)
-		print(response)
+		response = openai.ChatCompletion.create(
+    		model='gpt-3.5-turbo',
+    		n=1,
+    		messages=[
+        		{"role": "system", "content": user},
+    		]
+		)
 
-		# if (user == "hello"):
-		# 	txt.insert(END, "\n" + "Bot -> Hi there, how can I help?")
 
-		# elif (user == "hi" or user == "hii" or user == "hiiii"):
-		# 	txt.insert(END, "\n" + "Bot -> Hi there, what can I do for you?")
+		if (user == "hello"):
+			txt.insert(END, "\n" + "Bot -> Hi there, how can I help?")
 
-		# elif (user == "how are you"):
-		# 	txt.insert(END, "\n" + "Bot -> fine! and you")
+		elif (user == "hi" or user == "hii" or user == "hiiii"):
+			txt.insert(END, "\n" + "Bot -> Hi there, what can I do for you?")
+
+		elif (user == "how are you"):
+			txt.insert(END, "\n" + "Bot -> fine! and you")
+		else:
+			message = response.choices[0]['message']
+			print(message)
+			txt.insert(END, "\n" + f"Bot -> {message['content']}" + '\n')
+			print(response)
+
 
 		# elif (user == "fine" or user == "i am good" or user == "i am doing good"):
 		# 	txt.insert(END, "\n" + "Bot -> Great! how can I help you.")
@@ -60,9 +75,6 @@ def createWindow():
 		# 	txt.insert(END, "\n" + "Bot -> Sorry! I didn't understand that")
 
 		e.delete(0, END)
-
-
-
 
 	lable1 = Label(root, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=20, height=1).grid(
 		row=0)
