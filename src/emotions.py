@@ -27,9 +27,9 @@ def open_song():
     for i in range(7):
         for j in range(7):
             if np.array(emotion_prediction)[0][i]  == 1 and not opened:
-                json_data = requests.get(f"http://127.0.0.1:8000/api/songs/{i}")
-                json_data = json_data.json()
                 try:
+                    json_data = requests.get(f"http://127.0.0.1:8000/api/songs/{i}")
+                    json_data = json_data.json()
                     webbrowser.open(json_data['url'])
                 except Exception as e:
                     print("Error", e)
